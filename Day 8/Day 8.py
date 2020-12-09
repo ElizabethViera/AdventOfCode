@@ -24,13 +24,11 @@ def runTest(new_arr):
             else:
                 acc -= int(value)
             current_index += 1
-        elif current_instruction.split(" ")[0] == "jmp":
+        else:  # current_instruction.split(" ")[0] == "jmp":
             if sign == "+":
                 current_index += int(value)
             else:
                 current_index -= int(value)
-        else:
-            return(True)
 
 
 for i in range(len(arr)):
