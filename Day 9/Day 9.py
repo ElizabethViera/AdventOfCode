@@ -4,6 +4,8 @@ arr = fileContents.read().split('\n')
 start_index = 0
 numbers = []
 
+arr = [int(arr[i]) for i in range(len(arr))]
+
 
 def check_number(current_number, start_index, numbers):
     for i in numbers[start_index:]:
@@ -14,7 +16,7 @@ def check_number(current_number, start_index, numbers):
 
 
 for line in arr:
-    current_number = int(line)
+    current_number = line
     if len(numbers) > 25:
         if (check_number(current_number, start_index, numbers)):
             numbers.append(current_number)
@@ -28,30 +30,23 @@ for line in arr:
 magic_number = 393911906
 
 
-def sum_of_arr(array_of_nums):
-    total = 0
-    for i in array_of_nums:
-        total += int(i)
-    return total
-
-
-def rando():
+def get_magic_range():
     for i in range(650):
         for j in range(i+1, 650):
-            if sum_of_arr(arr[i:j]) >= magic_number:
-                if sum_of_arr(arr[i:j]) == magic_number:
+            if sum(arr[i:j]) >= magic_number:
+                if sum(arr[i:j]) == magic_number:
                     print("hello!", i, j)
                     return
-    print("done")
+    print("done? No range?")
 
 
-rando()  # my result of rando is the range 517-534
+get_magic_range()  # my result is the range 517-534
 
-max_num = int(arr[534])
-min_num = int(arr[517])
+max_num = arr[534]
+min_num = arr[517]
 for num in arr[517:534]:
-    if int(num) < min_num:
-        min_num = int(num)
-    if int(num) > max_num:
-        max_num = int(num)
+    if num < min_num:
+        min_num = num
+    if num > max_num:
+        max_num = num
 print(max_num + min_num)
