@@ -1,0 +1,27 @@
+Accounted for: 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 18, 19
+
+Class: 1
+Route: 2
+Arrival Platfor: 4
+Type: 5
+Departure Station: 6
+Departure Track: 7
+Row: 8
+Seat: 9
+Arrival Track: 10
+Zone: 11
+Departure Date: 12
+Departure Platform: 13
+Departure Time: 14
+Arrival Location: 15
+Departure Location: 18
+Arrival Station: 19
+
+6, 7, 12, 13, 14, 18
+131, 239, 109, 73, 157, 173
+
+
+Maybe price: 0,  16
+Maybe route: 0, 2,16
+0,2,3,16,
+
