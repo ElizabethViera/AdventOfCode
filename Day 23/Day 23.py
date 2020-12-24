@@ -1,3 +1,6 @@
+import datetime
+
+time = datetime.datetime.now()
 fileContents = open("Day 23/input")
 arr = fileContents.read().split('\n')
 arr = [int(c) for c in arr[0]]
@@ -40,8 +43,6 @@ currentNode.next = firstNode
 
 currentNode = firstNode
 for i in range(10000000):
-    if i % 10000 == 0:
-        print(i)
     firstNode = currentNode.removesNextNeighbor()
     secondNode = currentNode.removesNextNeighbor()
     thirdNode = currentNode.removesNextNeighbor()
@@ -58,7 +59,10 @@ for i in range(10000000):
 cup1 = node_dict[1].next.val
 cup2 = node_dict[1].next.next.val
 print(cup1 * cup2)
+newtime = datetime.datetime.now()
+print(newtime - time)
 current_cup_index = 0
+
 
 # Part 1:
 
