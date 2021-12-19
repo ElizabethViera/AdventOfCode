@@ -1,4 +1,3 @@
-import functools
 fileContents = open("Day 14/input.txt")
 maps = fileContents.read().split('\n')
 
