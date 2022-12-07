@@ -7,6 +7,6 @@ for i,c in enumerate(arr):
     if len(seen) == 15:
         seen = seen[1:]
     if len(set(seen)) == 14:
-        print(i)
+        print(i+1)
         print(seen)
         break
