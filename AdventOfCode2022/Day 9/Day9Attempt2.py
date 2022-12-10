@@ -54,64 +54,65 @@ def isAdjacent(point1, point2):
 def isDiagonal(point1, point2):
     return abs(point1[0] - point2[0]) !=  abs(point1[1] - point2[1])
 
+def headAndTailInLine(point1, point2):
+    return point1[0] == point2[0] or point1[1] == point2[1]
+
 def shouldMoveTail(head, tail):
     return not isAdjacent(head, tail)
 
-def moveTail(headCoords, tailCoords, dirs):
+def moveTail(headCoords, tailCoords):
+    dirs = orthoDirs if headAndTailInLine(headCoords, tailCoords) else diagonalDirs
+
     for dir in dirs:
         possibleNewPlace = movePointInDirection(tailCoords, dir)
         if isAdjacent(headCoords, possibleNewPlace):
             return possibleNewPlace
+    print("HELP, I DIDN'T FIND A PLACE TO PUT MY TAIL")
 
-def moveSnakeSegment(direction, headName, tailName):
+def moveSnakeSegment(direction, headCoords, tailCoords):
     if direction == 'O':
-        return (coords[headName], coords[tailName])
-    movedHeadCoords = movePointInDirection(coords[headName], direction)
-    if shouldMoveTail(movedHeadCoords, coords[tailName]):
-        
-        dirs = orthoDirs if isDiagonal(coords[headName], coords[tailName]) else diagonalDirs
-            
-        movedTailCoords = moveTail(movedHeadCoords, coords[tailName], dirs)
+        return (headCoords, tailCoords)
+    movedHeadCoords = movePointInDirection(headCoords, direction)
+    if shouldMoveTail(movedHeadCoords, tailCoords):    
+        movedTailCoords = moveTail(movedHeadCoords, tailCoords)
         return (movedHeadCoords, movedTailCoords)
-    return (movedHeadCoords, coords[tailName])
+    return (movedHeadCoords, tailCoords)
 
 def moveWholeSnake(direction):
-    print(direction)
-    newHead, newTail = moveSnakeSegment(direction, 'Head', '1')
+    # print(direction)
+    newHead, newTail = moveSnakeSegment(direction, coords['Head'], coords['1'])
     coords['Head'] = newHead
     tail_direction = getDirectionOfMovement(coords['1'], newTail)
     
-    OneNewPlace, TwoNewPlace = moveSnakeSegment(tail_direction, '1', '2')
+    OneNewPlace, TwoNewPlace = moveSnakeSegment(tail_direction, coords['1'], coords['2'])
     coords['1'] = OneNewPlace
     tail_direction = getDirectionOfMovement(coords['2'], TwoNewPlace)
 
-    print('Moved 1')
-
-    TwoNewPlace, ThreeNewPlace = moveSnakeSegment(tail_direction, '2', '3')
+    TwoNewPlace, ThreeNewPlace = moveSnakeSegment(tail_direction, coords['2'], coords['3'])
     coords['2'] = TwoNewPlace
     tail_direction = getDirectionOfMovement(coords['3'], ThreeNewPlace)
 
-    ThreeNewPlace, FourNewPlace = moveSnakeSegment(tail_direction, '3', '4')
+    ThreeNewPlace, FourNewPlace = moveSnakeSegment(tail_direction, coords['3'], coords['4'])
     coords['3'] = ThreeNewPlace
     tail_direction = getDirectionOfMovement(coords['4'], FourNewPlace)
 
-    FourNewPlace, FiveNewPlace = moveSnakeSegment(tail_direction, '4', '5')
+    FourNewPlace, FiveNewPlace = moveSnakeSegment(tail_direction, coords['4'], coords['5'])
     coords['4'] = FourNewPlace
     tail_direction = getDirectionOfMovement(coords['5'], FiveNewPlace)
 
-    FiveNewPlace, SixNewPlace = moveSnakeSegment(tail_direction, '5', '6')
+    FiveNewPlace, SixNewPlace = moveSnakeSegment(tail_direction, coords['5'], coords['6'])
     coords['5'] = FiveNewPlace
     tail_direction = getDirectionOfMovement(coords['6'], SixNewPlace)
 
-    SixNewPlace, SevenNewPlace = moveSnakeSegment(tail_direction, '6', '7')
+    SixNewPlace, SevenNewPlace = moveSnakeSegment(tail_direction, coords['6'], coords['7'])
     coords['6'] = SixNewPlace
     tail_direction = getDirectionOfMovement(coords['7'], SevenNewPlace)
 
-    SevenNewPlace, EightNewPlace = moveSnakeSegment(tail_direction, '7', '8')
+    SevenNewPlace, EightNewPlace = moveSnakeSegment(tail_direction, coords['7'], coords['8'])
     coords['7'] = SevenNewPlace
     tail_direction = getDirectionOfMovement(coords['8'], EightNewPlace)
 
-    EightNewPlace, NineNewPlace = moveSnakeSegment(tail_direction, '8', '9')
+    EightNewPlace, NineNewPlace = moveSnakeSegment(tail_direction, coords['8'], coords['9'])
     coords['8'] = EightNewPlace
 
     coords['9'] = NineNewPlace
@@ -123,6 +124,6 @@ for line in arr:
     count = int(leftright[1])
     for i in range(count):
         moveWholeSnake(direction)
-    print(coords)
+    #print(coords)
 
 print(len(placesNineHasBeen))
