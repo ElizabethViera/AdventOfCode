@@ -63,5 +63,3 @@ for monkey in monkeyList:
     results.append(monkeyList[monkey]['inspects'])
 
 print(sorted(results))
-
-print(187442*188167)
