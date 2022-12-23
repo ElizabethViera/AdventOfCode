@@ -4,6 +4,9 @@ Sensors = []
 Beacons = []
 blockedOut = set()
 
+import time
+start_time = time.time()
+
 for line in arr:
     contents = line.split(' ')
     Sx,Sy,Bx,By = int(contents[2][2:-1]), int(contents[3][2:-1]), int(contents[-2][2:-1]), int(contents[-1][2:]) 
@@ -34,6 +37,9 @@ def check(row, col):
         return
     if not isBlocked((row,col)):
         print( "FOUND: ", row,col)
+        print("--- %s seconds ---" % (time.time() - start_time))
+        print
+        # Exit program haha
 
 def blockOut2(coord, distance):
     total = distance+1
