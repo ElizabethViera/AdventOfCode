@@ -25,7 +25,7 @@ def operate(operator, left, right):
         case '*':
             return left * right
         case '/':
-            return left // right
+            return left / right
         case '==':
             return left == 23440423968672
 
@@ -39,11 +39,15 @@ def get_left_right(left, right, operator, trying_this_number):
     else:
         right_calc = get_left_right(monkey_dict[right]['Left_Friend'], monkey_dict[right]['Right_Friend'], monkey_dict[right]['Operator'], trying_this_number)
     if left == 'humn':
-        left = trying_this_number
+        left_calc = trying_this_number
     if right == 'humn':
-        print("Right!")
         right_calc = trying_this_number
     return operate(operator, left_calc, right_calc)
 
-for i in range(-10000000000000, 100000000000000, 1000000023434):
-    print(get_left_right('rhtg', 'nmms', '*', i))
+for i in range(3296135415000, 3296135420000, 1):
+    left_result = get_left_right('rhtg', 'nmms', '*', i)
+    right_result = get_left_right('ccwj', 'wqmc', '*', i)
+    # print(left_result - right_result)
+    if abs(left_result - right_result) == 0:
+        print(i)
+        
