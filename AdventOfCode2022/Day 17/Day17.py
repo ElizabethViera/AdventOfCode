@@ -1,8 +1,8 @@
 horizLine = [(2,0), (3,0), (4,0), (5,0)]
-cross = [(3,-2), (2,-1), (3,-1), (4,-1), (3,0)]
-bigL = [(2,0), (3,0), (4,0), (4,-1), (4,-2)]
-vertLine = [(2,-3), (2,-2), (2,-1), (2,0)]
-box = [(2,0), (3,0), (2,-1), (3,-1)]
+cross = [(3,2), (2,1), (3,1), (4,1), (3,0)]
+bigL = [(2,0), (3,0), (4,0), (4,1), (4,2)]
+vertLine = [(2,3), (2,2), (2,1), (2,0)]
+box = [(2,0), (3,0), (2,1), (3,1)]
 
 tetris_pieces = [horizLine, cross, bigL, vertLine, box]
 
@@ -17,7 +17,8 @@ def collides_with_existing_floor(coords, existing_floor):
             return True
     return False
 
-def air_push_piece(dir, piece_coords):
+def air_push_piece(dir, piece_coords, floor_coords):
+    # print("dir ", dir)
     new_piece_coords = []
     # print("dir = ", dir)
     if dir == '>':
@@ -35,7 +36,7 @@ def air_push_piece(dir, piece_coords):
             new_y = piece_coord[1]
             new_piece_coords.append((new_x, new_y))
     for new_piece in new_piece_coords:
-        if new_piece[0] < 0 or new_piece[0] > 6:
+        if new_piece[0] < 0 or new_piece[0] > 6 or new_piece in floor_coords:
             return piece_coords
     return new_piece_coords
 
@@ -53,7 +54,7 @@ def piece_falls(piece_coords, floor_coords):
 def place_piece(piece, highest_point):
     result = []
     for coord in piece:
-        result.append( (coord[0], coord[1] + highest_point + 3))
+        result.append( (coord[0], coord[1] + highest_point + 4))
     # print(result)
     return result
 
@@ -77,7 +78,7 @@ for i in range(2022):
     while (True):
         direction = arr[wind%len(arr)]
         wind += 1
-        piece = air_push_piece(direction, piece)
+        piece = air_push_piece(direction, piece, floor_coords)
         # print("after air push", piece)
         new_location_piece = piece_falls(piece, floor_coords)
         if new_location_piece == piece: 
@@ -86,6 +87,14 @@ for i in range(2022):
     for coord in piece:
         floor_coords.append(coord)
     highest_point = getNewHighestPoint(highest_point, new_location_piece)
-
-
+'''
+for row in range(20,0,-1):
+    for col in range(7):
+        if (col,row) in floor_coords:
+            print('#', end="")
+        else:
+            print(',', end="")
+    print("")
+'''
 print(highest_point)
+
