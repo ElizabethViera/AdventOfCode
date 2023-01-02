@@ -3,6 +3,7 @@ cross = [(3,2), (2,1), (3,1), (4,1), (3,0)]
 bigL = [(2,0), (3,0), (4,0), (4,1), (4,2)]
 vertLine = [(2,3), (2,2), (2,1), (2,0)]
 box = [(2,0), (3,0), (2,1), (3,1)]
+CYCLE_LENGTH = 1740
 
 tetris_pieces = [horizLine, cross, bigL, vertLine, box]
 
@@ -68,25 +69,32 @@ def getNewHighestPoint(highest_point, piece):
 fileContents = open("AdventOfCode2022/Day 17/input.txt")
 arr = fileContents.read().split("\n")
 arr = arr[0]
-wind = 0
-floor_coords = [(1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (0,0)]
-highest_point = 0
-for i in range(2022):
-    piece = make_piece(i)
-    piece = place_piece(piece, highest_point)
-    # print("piece = ", piece)
-    while (True):
-        direction = arr[wind%len(arr)]
-        wind += 1
-        piece = air_push_piece(direction, piece, floor_coords)
-        # print("after air push", piece)
-        new_location_piece = piece_falls(piece, floor_coords)
-        if new_location_piece == piece: 
-            break
-        piece = new_location_piece
-    for coord in piece:
-        floor_coords.append(coord)
-    highest_point = getNewHighestPoint(highest_point, new_location_piece)
+
+def dropDaBricks(n):
+    result_arr = []
+    wind = 0
+    floor_coords = set([(1,0), (2,0), (3,0), (4,0), (5,0), (6,0), (0,0)])
+    highest_point = 0
+    for i in range(n):
+        result_arr.append(highest_point)
+        piece = make_piece(i)
+        piece = place_piece(piece, highest_point)
+        # print("piece = ", piece)
+        while (True):
+            direction = arr[wind%len(arr)]
+            wind += 1
+            piece = air_push_piece(direction, piece, floor_coords)
+            # print("after air push", piece)
+            new_location_piece = piece_falls(piece, floor_coords)
+            if new_location_piece == piece: 
+                break
+            piece = new_location_piece
+        for coord in piece:
+            floor_coords.add(coord)
+        highest_point = getNewHighestPoint(highest_point, new_location_piece)
+    return result_arr
+
+# print(dropDaBricks(2022))
 '''
 for row in range(20,0,-1):
     for col in range(7):
@@ -96,5 +104,22 @@ for row in range(20,0,-1):
             print(',', end="")
     print("")
 '''
-print(highest_point)
 
+result_arr = dropDaBricks(100000)
+print("Done")
+for i in range(10000, 30000):
+    if result_arr[2*i] - result_arr[i] == result_arr[3*i] - result_arr[2*i] == result_arr[2*i+576] - result_arr[i+576] == result_arr[2*i+3576] - result_arr[i+3576]:
+        print(i)
+
+
+an_index = result_arr[50000]
+another_index = result_arr[50000 + CYCLE_LENGTH]
+each_cycle_raises_height_by = another_index - an_index
+
+GOAL = 1000000000000
+
+
+
+Goal = (each_cycle_raises_height_by * ((GOAL - 20*CYCLE_LENGTH) // CYCLE_LENGTH)) + result_arr[GOAL%CYCLE_LENGTH + 20*CYCLE_LENGTH]
+
+print(Goal)
