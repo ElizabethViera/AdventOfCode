@@ -83,7 +83,7 @@ def findPath(start):
                 next_queue.add(neighbor)
         queue = next_queue
         
-        print(step+1, queue)
+        # print(step+1, queue)
         '''
         for blizzard in blizzards[step]:
             print(blizzard)
