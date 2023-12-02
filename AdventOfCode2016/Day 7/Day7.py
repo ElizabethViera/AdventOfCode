@@ -1,44 +1,62 @@
-def searchWholeStringForReverse(s, s2):
-    expected1 = s2[0]
-    expected2 = s2[1]
-    expected3 = s2[0]
-    first = s[0]
-    second = s[1]
-    for third in s[2:]:
-        if first == expected1 and second == expected2 and third == expected3:
-            return True
-        else:
-            first = second
-            second = third
-    return False
-
-def searchExteriorOfBrackets(s):
-    first = s[0]
-    second = s[1]
-    for third in s[2:]:
-        if first == third and first != second:
-            return True
-        else:
-            first = second
-            second = third
-    return False
-
 fileContents = open("AdventOfCode2016/Day 7/input.txt")
 arr = fileContents.read().split("\n")
 
-result = 0
+def getABAs(s):
+    results = []
+    first_character = s[0]
+    second_character = s[1]
+    for third_character in s[2:]:
+        if first_character == third_character and first_character != second_character:
+            results.append([first_character, second_character])
+        first_character = second_character
+        second_character = third_character
+    
+    return results
 
+def isABABAB(line):
+    # print(line)
+    foundABABAB = False
+    outsideContents: list[list[str]] = []
+    segment: list[str] = []
+    for c in line:
+        if c == '[':
+            outsideContents.append(segment)
+            segment = []
+        elif c == ']':
+            segment = []
+        else:
+            segment.append(c)
+    outsideContents.append(segment)
+
+    segment = []
+    insideContents: list[list[str]] = []
+    for c in line:
+        if c == '[':
+            segment = []
+        elif c == ']':
+            insideContents.append(segment)
+            segment = []
+        else:
+            segment.append(c)
+
+    #print(outsideContents)
+    for segment in outsideContents:
+        abas = getABAs(segment)
+        for aba in abas:
+            bab: str = aba[1] + aba[0] + aba[1]
+            for insegment in insideContents:
+                if bab in ''.join(insegment):
+                    foundABABAB = True
+                    break
+            if foundABABAB:
+                break
+        if foundABABAB:
+            break
+    return foundABABAB
+
+total = 0
 for line in arr:
-    segments = line.split('[')
-    segments[0]
-        
-    for segment in segments[1:]:
-        interior, exterior = segment.split(']')[0], segment.split(']')[1]
-        if searchInteriorOfBrackets(interior):
-            hasInnerString = True
-        if searchExteriorOfBrackets(exterior):
-            hasOutterString = True
-    if hasOutterString and not hasInnerString:
-        result += 1
-
-print(result)
+    if isABABAB(line):
+        #print(line)
+        total += 1
+print(total)
