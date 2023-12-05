@@ -27,25 +27,33 @@ for row in range(len(arr)):
                 
 print(len(region_start))
 
-def hasSpecialCharacterInPerimeter(start, width) -> bool:
+def hasSpecialCharacterInPerimeter(start, width):
     for i in range(start[1]-1, start[1]+width+1):
         # should be row above the number
-        if arr[start[0]-1][i] != '.':
-            return True
-    if arr[start[0]][start[1]-1] != '.':
-        return True
-    if arr[start[0]][start[1]+width] != '.':
-        return True
+        if arr[start[0]-1][i] == '*':
+            return (start[0]-1, i)
+    if arr[start[0]][start[1]-1] == '*':
+        return (start[0], start[1]-1)
+    if arr[start[0]][start[1]+width] == '*':
+        return (start[0], start[1]+width)
     for i in range(start[1]-1, start[1]+width+1):
-        if arr[start[0]+1][i] != '.':
-            return True
-    return False
+        if arr[start[0]+1][i] == '*':
+            return (start[0]+1, i)
+    return None
 
+gearCoordToNums = dict()
 print('\n')
 total = 0
 for coord in region_start:
     numLength = len(region_start[coord])
-    if hasSpecialCharacterInPerimeter(coord, numLength):
-        #print(region_start[coord])
-        total += int(region_start[coord])
+    gear_coord = hasSpecialCharacterInPerimeter(coord, numLength)
+    if hasSpecialCharacterInPerimeter(coord, numLength) is not None:
+
+        if gear_coord not in gearCoordToNums:
+            gearCoordToNums[gear_coord] = []
+        gearCoordToNums[gear_coord].append(region_start[coord])
+
+for gear in gearCoordToNums:
+    if len(gearCoordToNums[gear]) == 2:
+        total += int(gearCoordToNums[gear][0]) * int(gearCoordToNums[gear][1])
 print(total)
