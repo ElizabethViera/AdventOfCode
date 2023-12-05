@@ -1,74 +1,51 @@
 fileContents = open("AdventOfCode2023/Day 3/input.txt")
 arr = fileContents.read().split("\n")
 
+found = set() # coordinates of number locations
+region_start = dict() # dictionary from a single coordinate to a value
 
-
-def inbounds(row, col):
-    if row < 0 or row >= len(arr) or col < 0 or col >= len(arr[0]):
-        return False
-    return True
-
-def getNeighbors(row, col):
-    neighbors = [(-1, -1), (-1, 0), (-1, 1),
-                    (0, -1), (0, 1),
-                (1, -1), (1, 0), (1, 1),
-                ]
-    results = []
-    for neighbor in neighbors:
-        if inbounds(row+neighbor[0], col+neighbor[1]):
-            results.append((row+neighbor[0], col+neighbor[1]))
-    return results
-
-numbersWithInterestingNeighbors = dict()
-numbersWithSymbolNeighbors = set()
-
-def gridAt(g):
-    return arr[g[0]][g[1]]
+def find_number_at(start_r: int, start_c: int) -> list[tuple[int, int]]:
+    r, c = start_r, start_c
+    result: list[tuple[int, int]] = []
+    while arr[r][c] in '1234567890':
+        result.append((r, c))
+        c += 1
+    return result
+    
 
 for row in range(len(arr)):
-    for col in range(len(arr[0])):
-        loc = (row, col)
-        if gridAt(loc) in '1234567890':
-            neighbors = getNeighbors(row, col)
-            for neighbor in neighbors:
-                if gridAt(neighbor) != '.':
-                    if loc not in numbersWithInterestingNeighbors:
-                        numbersWithInterestingNeighbors[loc] = []
-                    numbersWithInterestingNeighbors[loc].append(neighbor)
-                    if gridAt(neighbor) not in '1234567890':
-                        numbersWithSymbolNeighbors.add(loc)
-print(len(numbersWithInterestingNeighbors), len(numbersWithSymbolNeighbors))
+    for col in range(len(arr[row])):
+        if arr[row][col] in '1234567890':
+            if (row, col) not in found:
+                found.add((row,col))
+                digits = region_start[(row,col)] = find_number_at(row,col)
+                numStr = ''
+                for digit in digits:
+                    found.add(digit)
+                    numStr += arr[digit[0]][digit[1]]
+                region_start[(row, col)] = numStr
+                
+print(len(region_start))
 
+def hasSpecialCharacterInPerimeter(start, width) -> bool:
+    for i in range(start[1]-1, start[1]+width+1):
+        # should be row above the number
+        if arr[start[0]-1][i] != '.':
+            return True
+    if arr[start[0]][start[1]-1] != '.':
+        return True
+    if arr[start[0]][start[1]+width] != '.':
+        return True
+    for i in range(start[1]-1, start[1]+width+1):
+        if arr[start[0]+1][i] != '.':
+            return True
+    return False
 
-def doesNumberHaveSymbolNearIt(loc):
-    visited = set()
-    q = [loc]
-    foundSymbol = False
-    while q != []:
-        current = q.pop()
-        visited.add(current)
-        if current in numbersWithSymbolNeighbors:
-            foundSymbol = True
-        
-        for neighbor in numbersWithInterestingNeighbors[current]:
-            if neighbor not in visited:
-                q.append(neighbor)
-    if foundSymbol:
-        return visited
-    return []
-
-greenRegions = set()
-for num in numbersWithInterestingNeighbors:
-    for green in doesNumberHaveSymbolNearIt(num):
-        greenRegions.add(green)
-
-def printGrid(s):
-    for i in range(10):
-        for j in range(10):
-            if (i,j) in s:
-                print('G', end='')
-            else:
-                print('.', end='')
-        print('\n')
-
-printGrid(sorted(greenRegions))
+print('\n')
+total = 0
+for coord in region_start:
+    numLength = len(region_start[coord])
+    if hasSpecialCharacterInPerimeter(coord, numLength):
+        #print(region_start[coord])
+        total += int(region_start[coord])
+print(total)
