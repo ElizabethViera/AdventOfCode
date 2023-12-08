@@ -66,6 +66,4 @@ for hand in arr:
 total = 0
 for i, key in enumerate(sorted(handToBid)[::-1]):
     total += handToBid[key]*(i+1)
-    #print(i)
-    #printHandFromKey(key)
 print(total)
