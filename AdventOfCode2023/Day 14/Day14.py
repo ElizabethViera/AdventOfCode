@@ -1,4 +1,4 @@
-fileContents = open("AdventOfCode2023/Day 14/sampleInput.txt")
+fileContents = open("AdventOfCode2023/Day 14/input.txt")
 grid = fileContents.read().split("\n")
 
 rows = len(grid)
