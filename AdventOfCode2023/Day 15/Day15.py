@@ -1,17 +1,6 @@
 fileContents = open("AdventOfCode2023/Day 15/input.txt")
 grid = fileContents.read().split(",")
 
-'''
-for line in grid:
-    currentValue = 0
-    for c in line:
-        asci = int(ord(c))
-        currentValue += asci
-        currentValue *= 17
-        currentValue %= 256
-    total += currentValue
-'''
-
 def getHash(s):
     currentValue = 0
     for c in s:
