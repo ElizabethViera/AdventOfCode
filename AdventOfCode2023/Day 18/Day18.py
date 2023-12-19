@@ -67,8 +67,9 @@ for row in range(x1, x2):
             continue
         
         elif isSurroundedByGridStuff(row,col, grid):
-            s += 'i'
+            s += '.'
             interiors += 1
         else:
             s += '.'
 print(interiors + len(edges))
+print(s)
