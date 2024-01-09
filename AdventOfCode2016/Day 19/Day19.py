@@ -1,11 +1,12 @@
 elves = [i for i in range(1,3005291)]
+currentElfIndex = 0
 while len(elves) > 1:
-    print(elves)
-    if len(elves)%2 == 0:
-        elves = [i for e,i in enumerate(elves) if e%2 == 0]
-    else:
-        elves = [i for e,i in enumerate(elves) if e%2 == 0 and e != 0]
+    if len(elves)%10000 == 0:
+        print(len(elves))
+    offset = len(elves)//2
+    removeElf = elves[(currentElfIndex+offset)%len(elves)]
+    if removeElf > currentElfIndex:
+        currentElfIndex += 1
+    elves = elves[:removeElf-1] + elves[removeElf:]
 print(elves)
 
-# 1816277
-# 2097151
