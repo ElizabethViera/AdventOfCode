@@ -7,15 +7,15 @@ for rule in rules:
     left, right = rule.split(' => ')
     rule_dict[left] = right
 
-initial_state = 'this is where my input would go'
+initial_state = '#..#####.#.#.##....####..##.#.#.##.##.#####..####.#.##.....#..#.#.#...###..#..###.##.#..##.#.#.....#'
 state = dict()
 for i,c in enumerate(initial_state):
     state[i] = c
 
 def updateState(s):
     newDict = dict()
-
-    for k in range(-1000, 1000):
+    keys = sorted(s.keys())
+    for k in range(keys[0]-2, keys[-1]+2):
         this_string = ''
         for i in range(k-2, k+3):
             if i not in s:
@@ -28,10 +28,6 @@ def updateState(s):
             newDict[k] = '.'
     return newDict
 
-for i in range(50000000000):
-    if i%500000000 == 0:
-        print(i)
-    state = updateState(state)
 
 def scoreState(s):
     total = 0
@@ -39,4 +35,33 @@ def scoreState(s):
         if s[k] == '#':
             total += k
     return total
-print(scoreState(state))
+
+target = 10005
+
+states_seen = dict()
+for i in range(target+1):
+    if i%1000 == 0:
+        print(i)
+    state = updateState(state)
+    states_seen[i+1] = scoreState(state)
+
+# print("made dict")
+
+# for i in range(9400, 9500):
+#         if states_seen[i+5] - states_seen[i] == states_seen[i+10] - states_seen[i+5]:
+#             print(states_seen[i+5] - states_seen[i], i, states_seen[i])
+
+    
+'''
+105 9494 199875
+105 9495 199896
+105 9496 199917
+105 9497 199938
+105 9498 199959
+105 9499 199980
+'''
+
+example = 9495
+
+print(states_seen[target], "should be: ")
+print((105*(50000000000 - example)//5) + states_seen[example]) # 1050000000501
