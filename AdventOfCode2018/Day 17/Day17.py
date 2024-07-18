@@ -1,6 +1,26 @@
 fileContents = open("AdventOfCode2018/Day 17/input.txt")
 contents = fileContents.read().split("\n")
 
+#######
+# Misc Helpers
+########
+
+def sort_by_y(p):
+    return p[1]
+
+def sort_by_x(p):
+    return p[0]
+
+def xy_in_water(x,y):
+    for w in water:
+        if x == w[0] and y == w[1]:
+            return True
+    return False
+
+########
+# Parse Initial State 
+########
+
 points = set()
 water_source = (500,1)
 water: set[tuple[int, int]] = set([water_source])
@@ -24,27 +44,18 @@ for line in contents:
         for k in range(l,r+1):
             points.add((k,y))
 
-
-def sort_by_y(p):
-    return p[1]
+########
+# Get bounds for when we want to print the grid
+########
 
 points = sorted(points, key=sort_by_y)    
 lowest_y = points[-1][1]
-print(lowest_y)
-
-def sort_by_x(p):
-    return p[0]
 
 points = sorted(points, key=sort_by_x)
 lowest_x = points[0][0]
 highest_x = points[-1][0]
-print(lowest_x, highest_x)
+print(lowest_y, lowest_x, highest_x)
 
-def xy_in_water(x,y):
-    for w in water:
-        if x == w[0] and y == w[1]:
-            return True
-    return False
 
 #########
 # Render Grid
