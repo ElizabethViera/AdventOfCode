@@ -21,7 +21,7 @@ def xy_in_water(x,y):
 # Parse Initial State 
 ########
 
-points = set()
+walls = set()
 water_source = (500,1)
 water: set[tuple[int, int]] = set([water_source])
 
@@ -35,25 +35,25 @@ for line in contents:
         l = int(right.split('..')[0])
         r = int(right.split('..')[1])
         for k in range(l,r+1):
-            points.add((x,k))
+            walls.add((x,k))
     else:
         y = int(left[2:])
         right = right[2:]
         l = int(right.split('..')[0])
         r = int(right.split('..')[1])
         for k in range(l,r+1):
-            points.add((k,y))
+            walls.add((k,y))
 
 ########
 # Get bounds for when we want to print the grid
 ########
 
-points = sorted(points, key=sort_by_y)    
-lowest_y = points[-1][1]
+walls = sorted(walls, key=sort_by_y)    
+lowest_y = walls[-1][1]
 
-points = sorted(points, key=sort_by_x)
-lowest_x = points[0][0]
-highest_x = points[-1][0]
+walls = sorted(walls, key=sort_by_x)
+lowest_x = walls[0][0]
+highest_x = walls[-1][0]
 print(lowest_y, lowest_x, highest_x)
 
 
@@ -66,7 +66,7 @@ def render_grid():
         for x in range(lowest_x, highest_x+1):
             if xy_in_water(x,y):
                 line = line + '~'
-            elif (x,y) in points:
+            elif (x,y) in walls:
                 line = line + '#'
             else:
                 line = line + '.'
@@ -81,13 +81,13 @@ def add_water():
             print("Done! ", len(water))
             render_grid()
             raise(ValueError)
-        if down_1 not in water and down_1 not in points:
+        if down_1 not in water and down_1 not in walls:
             return down_1
         left_1 = (current_water[0]-1, current_water[1])
-        if left_1 not in water and left_1 not in points:
+        if left_1 not in water and left_1 not in walls:
             return left_1
         right_1 = (current_water[0]+1, current_water[1])
-        if right_1 not in water and right_1 not in points:
+        if right_1 not in water and right_1 not in walls:
             return right_1
     print("Done! ", len(water))
     raise(ValueError)
