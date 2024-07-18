@@ -78,9 +78,7 @@ def add_water():
         current_water = sorted_water.pop()
         down_1 = (current_water[0], current_water[1]+1)
         if down_1[1] > lowest_y:
-            print("Done! ", len(water))
-            render_grid()
-            raise(ValueError)
+            return None
         if down_1 not in water and down_1 not in walls:
             return down_1
         left_1 = (current_water[0]-1, current_water[1])
@@ -89,11 +87,32 @@ def add_water():
         right_1 = (current_water[0]+1, current_water[1])
         if right_1 not in water and right_1 not in walls:
             return right_1
-    print("Done! ", len(water))
-    raise(ValueError)
-        
-while len(water) < 60:
+    return None
+
+i = 0
+while True:
+    if len(water)%1000 == 0:
+        print(len(water))
     new_water = add_water()
+    if new_water == None:
+        break
     water.add(new_water)
+
 print(len(water))
+print("first pass done")
 render_grid()
+'''
+total = len(water)
+water = set()
+ 
+for coord in new_coords:
+    water.add(coord)
+
+while True:
+    new_water = add_water()
+    if new_water == None:
+        break
+    water.add(new_water)
+print(len(water) + total)
+render_grid()
+'''
