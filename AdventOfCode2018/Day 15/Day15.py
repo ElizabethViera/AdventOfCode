@@ -1,221 +1,236 @@
 from dataclasses import dataclass
 
+pos = tuple[int, int]
+
+directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+
+
 @dataclass
 class Unit:
-    type: str
-    health: int = 200
-    attack: int = 3
-    died: bool = False
+  type: str
+  location: pos
+  health: int = 200
+  attack: int = 3
+  died: bool = False
 
-    
-
-    def attacks(self, opponent):
-        opponent.health -= self.attack
-        if opponent.health <= 0:
-            opponent.died = True
-
-GAME_OVER = 'GAME OVER'
-walls = set() # (row,col)
-
-units: dict[tuple[int, int], 'Unit'] = dict()
-# tuple row, col to Unit
-
-neighbors = [(-1,0), (0, -1), (0,1), (1,0)]
-
-def addPts(a,b):
-    return a[0] + b[0], a[1] + b[1]
-
-def isReachable(a,b, pending_units, new_units, walls):
-    visited = set()
-    to_visit = [a]
-    while to_visit != []:
-        current_unit = to_visit.pop(0)
-        if current_unit in visited:
-            continue
-        visited.add(current_unit)
-        local_neighbors = [addPts(neighbor, current_unit) for neighbor in neighbors]
-        for local_neighbor in local_neighbors:
-            if local_neighbor == b:
-                return True
-            if local_neighbor in pending_units:
-                continue
-            if local_neighbor in new_units:
-                continue
-            if local_neighbor in walls:
-                continue
-            to_visit.append(local_neighbor)
-    return False
-
-def getDistance(a,b, pending_units, new_units, walls):
-    blocks = set()
-    for p in pending_units:
-        blocks.add(p)
-    for p in new_units:
-        blocks.add(p)
-    for p in walls:
-        blocks.add(p)
-    distances = dict()
-    distances[a] = 0
-    visited = set()
-    to_visit = [a]
-    while to_visit != []:
-        current_unit = to_visit.pop(0)
-        if current_unit in visited:
-            continue
-        visited.add(current_unit)
-        local_neighbors = [addPts(neighbor, current_unit) for neighbor in neighbors]
-        for local_neighbor in local_neighbors:
-            if local_neighbor in blocks:
-                continue
-            to_visit.append(local_neighbor)
-            if local_neighbor not in distances or distances[current_unit] + 1 < distances[local_neighbor]:
-                distances[local_neighbor] = distances[current_unit] + 1
-    return distances[b]
-
-def getTarget(t: dict[tuple[int,int], 'Unit']):
-    leastHealthSeen = 204
-    unitWithLeastHealth = (-1, -1)
-    for k in t:
-        if t[k].health < leastHealthSeen:
-            leastHealthSeen = t[k].health
-            unitWithLeastHealth = k
-        elif t[k].health == leastHealthSeen:
-            if k < unitWithLeastHealth:
-                unitWithLeastHealth = k
-    return t[unitWithLeastHealth]
+  def attacks(self, opponent: "Unit"):
+    opponent.health -= self.attack
+    if opponent.health <= 0:
+      opponent.died = True
 
 
-def getStep(b,a, pending_units, new_units, walls):
-    blocks = set()
-    for p in pending_units:
-        blocks.add(p)
-    for p in new_units:
-        blocks.add(p)
-    for p in walls:
-        blocks.add(p)
-    distances = dict()
-    distances[b] = 0
-    visited = set()
-    visited.add(b)
-    to_visit = [b]
-    while to_visit != []:
-        current_unit = to_visit.pop(0)
-        if current_unit in visited:
-            continue
-        visited.add(current_unit)
-        local_neighbors = [addPts(neighbor, current_unit) for neighbor in neighbors]
-        for local_neighbor in local_neighbors:
-            if local_neighbor in blocks:
-                continue
-            to_visit.append(local_neighbor)
-            if local_neighbor not in distances or distances[current_unit] + 1 < distances[local_neighbor]:
-                distances[local_neighbor] = distances[current_unit] + 1
-    local_neighbors = [addPts(neighbor, a) for neighbor in neighbors]
-    for local_neighbor in local_neighbors:
-        print("local_neighbor = ", local_neighbor, distances)
-        if local_neighbor in blocks:
-            continue
-        if local_neighbor in distances and distances[local_neighbor] == distances[a]-1:
-            return local_neighbor
-    raise(ValueError)
+def add_pts(a: pos, b: pos):
+  return (a[0] + b[0], a[1] + b[1])
 
-def takeTurn(units):
-    pending_units = sorted(units.keys())
-    new_unit_locations: dict[tuple[int, int], 'Unit'] = dict()
-    while pending_units != []:
-        # get a unit
-        # check that unit is alive
-        # get targets
-        # check if has a target that is already hittable
-        # if not, move to a hittable target
-        unit = pending_units.pop(0)
-        if units[unit].died:
-            continue
-        targets: list[tuple[int,int]] = []
-        for x in pending_units:
-            if units[x].type != units[unit].type:
-                targets.append(x)
 
-        for x in new_unit_locations:
-            if new_unit_locations[x].type != units[unit].type:
-                targets.append(x)
+def get_neighbors(p: pos) -> list[pos]:
+  result: list[pos] = []
+  for d in directions:
+    candidate_loc = add_pts(p, d)
+    if candidate_loc not in walls:
+      result.append(candidate_loc)
+  return result
 
-        if targets == []:
-            return GAME_OVER
-        already_in_range = False
-        for neighbor in neighbors:
-            to_check = addPts(unit, neighbor)
-            if to_check in targets:
-                new_unit_locations[unit] = units[unit]
-                already_in_range = True
-                current_location = unit
 
-        if not already_in_range:
-            enemy_hit_boxes = []
-            for target in targets:
-                #identify open slots
-                for neighbor in neighbors:
-                    to_check = addPts(target,neighbor)
-                    if to_check in walls or to_check in units:
-                        continue
-                    else:
-                        enemy_hit_boxes.append(to_check)
-            
-            
-            reachable = []
-            for hit_box in enemy_hit_boxes:
-                if isReachable(unit, hit_box, pending_units, new_unit_locations, walls):
-                    reachable.append(hit_box)
-            if len(reachable) == 0:
-                new_unit_locations[unit] = units[unit]
-                continue
-            
-            distances_to_reachable = dict()
-            for reachable_block in reachable:
-                d = getDistance(unit, reachable_block, pending_units, new_unit_locations, walls)
-                if d not in distances_to_reachable:
-                    distances_to_reachable[d] = []
-                distances_to_reachable[d].append(reachable_block)
-            distances_to_reachable_keys = sorted(distances_to_reachable)
+def distanceToLoc(s: pos, t: pos) -> int | None:
+  distances = [(s)]
+  all_distances: dict[pos, int] = dict()
+  all_distances[s] = 0
+  while distances != []:
+    to_check = distances.pop(0)
+    neighbors = get_neighbors(to_check)
+    for n in neighbors:
+      if n == t:
+        return all_distances[to_check] + 1
+      if n in all_unit_locations or n in all_distances:
+        continue
+      else:
+        distances.append(n)
+        all_distances[n] = all_distances[to_check] + 1
+  return None  # no path to target
 
-            destination_distance = distances_to_reachable_keys[0]
-            destination_block = sorted(distances_to_reachable[destination_distance])[0]
-            step_to_block = getStep(unit, destination_block, pending_units, new_unit_locations, walls)
-            new_unit_locations[step_to_block] = units[unit]
-            current_location = step_to_block
 
-        
-        print("unit ", unit, " moving to ", current_location)
-        # find and attack target
-        targets_in_range: dict[tuple[int,int], 'Unit'] = dict()
-        for n in neighbors:
-            in_range = addPts(current_location,n)
-            if in_range in targets:
-                targets_in_range[in_range] = new_unit_locations[in_range] if in_range in new_unit_locations else units[in_range]
-        if len(targets_in_range) == 0:
-            continue
-        else:
-            print('attacking')
-            new_unit_locations[current_location].attacks(getTarget(targets_in_range))
-    return new_unit_locations
+def distanceToEverything(s: pos) -> dict[pos, int]:
+  distances = [(s)]
+  all_distances: dict[pos, int] = dict()
+  all_distances[s] = 0
+  while distances != []:
+    to_check = distances.pop(0)
+    neighbors = get_neighbors(to_check)
+    for n in neighbors:
+      if n in all_unit_locations or n in all_distances:
+        continue
+      else:
+        distances.append(n)
+        all_distances[n] = all_distances[to_check] + 1
+  return all_distances
 
-           
+
+def inRangeOfTarget(unit: Unit, targets: list[Unit]):
+  unit_range: list[pos] = []
+  for d in directions:
+    unit_range.append(add_pts(unit.location, d))
+  for t in targets:
+    if t.died:
+      continue
+    if t.location in unit_range:
+      return True
+  return False
+
+
+def getInRangeTargets(unit: Unit, targets: list[Unit]):
+  unit_range: list[pos] = []
+  for d in directions:
+    unit_range.append(add_pts(unit.location, d))
+  in_range_targets: list[Unit] = []
+  for t in targets:
+    if t.died:
+      continue
+    if t.location in unit_range:
+      in_range_targets.append(t)
+  return in_range_targets
+
+
+def getAllTargetHitBoxes(targets: list[Unit]) -> list[pos]:
+  result: list[pos] = []
+  targets = [t for t in targets if not t.died]
+  for t in targets:
+    for d in directions:
+      candidate = add_pts(t.location, d)
+      if candidate not in walls and candidate not in all_unit_locations:
+        result.append(candidate)
+  return result
+
+
+#####################
+# Parse Initial State
+#####################
 fileContents = open("AdventOfCode2018/Day 15/input.txt")
 contents = fileContents.read().split("\n")
+walls: set[pos] = set()
+all_unit_locations: set[pos] = set()
+elves: list[Unit] = []
+goblins: list[Unit] = []
 
-for r, row in enumerate(contents):
-    for c, char in enumerate(row):
-        if char == '#':
-            walls.add((r,c))
-        if char == 'G':
-            units[(r,c)] = Unit('G')
-        if char == 'E':
-            units[(r,c)] = Unit('E')
+for row, line in enumerate(contents):
+  for col, c in enumerate(line):
+    location = (row, col)
+    if c == "#":
+      walls.add(location)
+    if c == "E":
+      elf = Unit("E", location)
+      elves.append(elf)
+      all_unit_locations.add(location)
+    if c == "G":
+      goblin = Unit("G", location)
+      goblins.append(goblin)
+      all_unit_locations.add(location)
 
-result = units
-turns = 0
-while turns <= 1:
-    turns += 1
-    result = takeTurn(result)
 
-print(turns)
+def get_next_step(unit_location: pos, destination: pos) -> pos:
+  all_distances = distanceToEverything(destination)
+  steps_from_unit_location = [
+    add_pts(d, unit_location)
+    for d in directions
+    if add_pts(d, unit_location) in all_distances
+  ]
+
+  def next_step_key(step: pos) -> tuple[int, tuple[int, int]]:
+    return (all_distances[step], step)
+
+  return min(steps_from_unit_location, key=next_step_key)
+
+
+def get_destination(unit_location: pos, battle_spaces: list[pos]):
+  all_distances = distanceToEverything(unit_location)
+  battle_spaces = [
+    battle_space for battle_space in battle_spaces if battle_space in all_distances
+  ]
+
+  if battle_spaces == []:
+    return None
+
+  def battle_space_key(battle_space: pos) -> tuple[int, tuple[int, int]]:
+    return (all_distances[battle_space], battle_space)
+
+  return min(battle_spaces, key=battle_space_key)
+
+
+def sortByLocation(u: Unit):
+  return u.location
+
+
+def takeTurn():
+  all_units_at_start_of_turn = sorted(elves + goblins, key=sortByLocation)
+  for unit in all_units_at_start_of_turn:
+    if unit.died:
+      continue
+    if unit.type == "E":
+      targets = goblins
+    elif unit.type == "G":
+      targets = elves
+    else:
+      raise (ValueError)
+    targets = [t for t in targets if not t.died]
+    if len(targets) == 0:
+      print("Game Over")
+      return True
+    if inRangeOfTarget(unit, targets):
+      # don't move
+      pass
+    else:
+      # decide if/how to move
+      targetHitBoxes = getAllTargetHitBoxes(targets)
+      destination = get_destination(unit.location, targetHitBoxes)
+      if destination:
+        new_location = get_next_step(unit.location, destination)
+        all_unit_locations.remove(unit.location)
+        unit.location = new_location
+        all_unit_locations.add(new_location)
+    if inRangeOfTarget(unit, targets):
+      in_range_targets = getInRangeTargets(unit, targets)
+      if in_range_targets != []:
+        getting_thwacked = min(in_range_targets, key=lambda x: x.health)
+        unit.attacks(getting_thwacked)
+        if getting_thwacked.died:
+          all_unit_locations.remove(getting_thwacked.location)
+  return False
+
+
+def calculateScore(e: list[Unit], g: list[Unit], round: int) -> int:
+  sum_of_alive_team = 0
+  for elf in e:
+    if not elf.died:
+      sum_of_alive_team = sum([i.health for i in e if not i.died])
+  for gob in g:
+    if not gob.died:
+      sum_of_alive_team = sum([i.health for i in g if not i.died])
+  return sum_of_alive_team * round
+
+
+def print_board(g: list[Unit], e: list[Unit], w: set[pos]):
+  for i in range(8):
+    for j in range(7):
+      goblin_pos = [p.location for p in g if not p.died]
+      elf_pos = [p.location for p in e if not p.died]
+      if (i, j) in w:
+        print("#", end="")
+      elif (i, j) in goblin_pos:
+        print("G", end="")
+      elif (i, j) in elf_pos:
+        print("E", end="")
+      else:
+        print(".", end="")
+    print("")
+
+
+round = 0
+while True:
+  print(round)
+  round += 1
+  gameOver = takeTurn()
+  # print(elves, goblins)
+  # print_board(goblins, elves, walls)
+  if gameOver:
+    print(calculateScore(elves, goblins, round - 1))
+    raise (ValueError())

@@ -1,75 +1,56 @@
-
 fileContents = open("AdventOfCode2023/Day 18/input.txt")
-arr = fileContents.read().split("\n")
+ins = fileContents.read().split("\n")
 
-dirs = {
-    'U': (-1, 0),
-    'D': (1, 0),
-    'L': (0, -1),
-    'R': (0, 1)
-}
+Pos = tuple[int, int]
+points: list[Pos] = []
 
-def addPos(a, b):
-    return (a[0] + b[0], a[1] + b[1])
-
-grid = set()
-current_pos = (0,0)
-for ins in arr:
-    d = ins.split(' ')[0]
-    l = int(ins.split(' ')[1])
-    for i in range(l):
-        grid.add((*current_pos, d))
-        current_pos = addPos(current_pos, dirs[d])
-
-def findBoundingCoords(g):
-    min_x = None
-    min_y = None
-    max_x = None
-    max_y = None
-    for p in g:
-        if min_x == None or p[0] < min_x:
-            min_x = p[0]
-        if min_y == None or p[1] < min_y:
-            min_y = p[1]
-        if max_x == None or p[0] > max_x:
-            max_x = p[0]
-        if max_y == None or p[1] > max_y:
-            max_y = p[1]
-    if min_x == None or min_y == None or max_x == None or max_y == None:
-        raise(ValueError)
-    return min_x, min_y, max_x+1, max_y+1
-
-x1, y1, x2, y2 = findBoundingCoords(grid)
-print(x1, y1, x2, y2)
+dirs = {3: (-1, 0), 1: (1, 0), 2: (0, -1), 0: (0, 1)}
 
 
-def isSurroundedByGridStuff(row, col, g):
-    sameRow = [x for x in set(g) if x[0] == row and x[1] < col]
-    ups, downs = 0, 0
-    for x in sameRow:
-        if x[2] == 'U':
-            ups += 1
-        if x[2] == 'D':
-            downs += 1
-    return (ups + downs)%2 == 1
+def add_pts(a: Pos, b: Pos) -> Pos:
+  return a[0] + b[0], a[1] + b[1]
 
-edges = set()   
-for item in grid:
-    edges.add((item[0], item[1]))
-    
-s = ''
-interiors = 0
-for row in range(x1, x2):
-    s += '\n'
-    for col in range(y1, y2):
-        if (row, col) in edges:
-            s += 'e'
-            continue
-        
-        elif isSurroundedByGridStuff(row,col, grid):
-            s += '.'
-            interiors += 1
-        else:
-            s += '.'
-print(interiors + len(edges))
-print(s)
+
+def get_dist_travelled(dis, direct):
+  d = dirs[direct]
+  return d[0] * dis, d[1] * dis
+
+
+loc = (0, 0)
+points.append(loc)
+for i in ins:
+  left, right = i.split("(")[0], i.split("(")[1][1:-1]
+  hex_code = right[:5]
+  dirr = int(right[-1])
+  dist = int(hex_code, 16)
+  loc = add_pts(loc, get_dist_travelled(dist, dirr))
+  points.append(loc)
+print(points)
+
+points = sorted(points)
+
+overall_total = 0
+last_x = points[0][0]
+last_y = points[0][1]
+in_bounds = True
+local_total = 0
+for p in points[1:]:
+  if p[0] != last_x:
+    overall_total += local_total * (p[0] - last_x)
+    last_x = p[0]
+    local_total = 0
+    last_y = p[1]
+  else:
+    if in_bounds:
+      local_total += p[1] - last_y  # TODO handle negative values
+    else:
+      pass
+    last_y = p[1]
+    in_bounds = not in_bounds
+
+overall_total += local_total * (p[0] - last_x)
+last_x = p[0]
+local_total = 0
+last_y = p[1]
+
+print(overall_total - 952408144115)
