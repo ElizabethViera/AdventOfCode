@@ -1,9 +1,8 @@
 fileContents = open("AdventOfCode2024/Day 1/input.txt")
 arr = fileContents.read().split("\n")
 
-print("hello world")
-left_numbers = []
-right_numbers = []
+left_numbers: list[int] = []
+right_numbers: list[int] = []
 
 for line in arr:
     left, right = int(line.split("   ")[0]), int(line.split("   ")[1])
