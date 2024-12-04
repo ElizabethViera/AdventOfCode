@@ -7,9 +7,26 @@ for row, line in enumerate(arr):
     for col, char in enumerate(line):
         word_search[(row, col)] = char
 
-words = ["ASMSM", "AMSMS", "AMSSM", "ASMMS"]
 
-x_shape = [(0, 0), (-1, -1), (1, 1), (1, -1), (-1, 1)]
+forward = [(0, 0), (0, 1), (0, 2), (0, 3)]
+down = [(0, 0), (1, 0), (2, 0), (3, 0)]
+backward = [(0, 0), (0, -1), (0, -2), (0, -3)]
+up = [(0, 0), (-1, 0), (-2, 0), (-3, 0)]
+diagonal_right_down = [(0, 0), (1, 1), (2, 2), (3, 3)]
+diagonal_left_up = [(0, 0), (-1, -1), (-2, -2), (-3, -3)]
+diagonal_left_down = [(0, 0), (1, -1), (2, -2), (3, -3)]
+diagonal_right_up = [(0, 0), (-1, 1), (-2, 2), (-3, 3)]
+
+dirs = [
+    forward,
+    down,
+    backward,
+    up,
+    diagonal_right_down,
+    diagonal_left_up,
+    diagonal_left_down,
+    diagonal_right_up,
+]
 
 
 def add_pts(a, b):
@@ -28,6 +45,7 @@ def get_word(pos: tuple[int, int], dir: list[tuple[int, int]]):
 
 total = 0
 for p in word_search:
-    if get_word(p, x_shape) in words:
-        total += 1
+    for dir in dirs:
+        if get_word(p, dir) == "XMAS":
+            total += 1
 print(total)
