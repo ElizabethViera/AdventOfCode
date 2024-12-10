@@ -1,5 +1,10 @@
 from itertools import product
 
+from datetime import datetime
+
+start = datetime.now()
+
+
 listsContents = open("AdventOfCode2024/Day 7/input.txt")
 equations = listsContents.read().split("\n")
 
@@ -35,3 +40,6 @@ for line in equations:
         result += left
 
 print(result)
+
+end = datetime.now()
+print(end - start)
