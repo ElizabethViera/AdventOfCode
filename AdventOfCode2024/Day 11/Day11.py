@@ -19,7 +19,6 @@ def blink(rocks):
             result.append(rock * 2024)
     return result
 
-def blink_2()
 
 stones = [int(x) for x in stones]
 
