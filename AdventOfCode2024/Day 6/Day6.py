@@ -1,5 +1,8 @@
 listsContents = open("AdventOfCode2024/Day 6/input.txt")
 map_data = listsContents.read().split("\n")
+import datetime
+
+start = datetime.datetime.now()
 
 walkable_all = set()
 walls_all = set()
@@ -53,3 +56,6 @@ for i, pos in enumerate(walkable_all):
     if pos != (guard[0], guard[1]) and guard_path(guard, dir, test_walls, walkable_all):
         total += 1
 print(total)
+
+end = datetime.datetime.now()
+print(end - start)
