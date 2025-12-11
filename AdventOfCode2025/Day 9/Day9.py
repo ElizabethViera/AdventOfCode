@@ -62,7 +62,7 @@ def isValidRectangle(a, b, perimeter):
             (top_left_row + i, top_left_col),
             (top_left_row + i, top_left_col + 1),
         )
-        if first in perimeter and second in perimeter:
+        if second in perimeter:
             return False
 
     # Walk Right Side
@@ -71,7 +71,7 @@ def isValidRectangle(a, b, perimeter):
             (top_left_row + i, bottom_right_col),
             (top_left_row + i, bottom_right_col - 1),
         )
-        if first in perimeter and second in perimeter:
+        if second in perimeter:
             return False
 
     # Walk Top Side
@@ -80,7 +80,7 @@ def isValidRectangle(a, b, perimeter):
             (top_left_row, top_left_col + i),
             (top_left_row + 1, top_left_col + i),
         )
-        if first in perimeter and second in perimeter:
+        if second in perimeter:
             return False
 
     # Walk Bottom Side
@@ -89,7 +89,7 @@ def isValidRectangle(a, b, perimeter):
             (bottom_right_row, top_left_col + i),
             (bottom_right_row - 1, top_left_col + i),
         )
-        if first in perimeter and second in perimeter:
+        if second in perimeter:
             return False
     return True
 
