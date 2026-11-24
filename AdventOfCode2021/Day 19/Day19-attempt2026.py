@@ -52,7 +52,7 @@ class Rotation:
 
     def getInverse(self):
         perms = tuple([self.perms.index(i) for i in range(3)])
-        negations = tuple([self.negations[i] for i in self.perms])
+        negations = tuple([self.negations[i] for i in perms])
         inverse = Rotation(perms=perms, negations=negations)  # pyright: ignore
         return inverse
 
@@ -231,27 +231,32 @@ while len(homeTransforms) < len(parsed):
                 homeTransforms[i] = homeTransforms[neighbor[0]] + [neighbor[1]]
 
 
-testResultContents = open("AdventOfCode2021/Day 19/testresults.txt")
-testResultarr = testResultContents.read().split("\n")
-
-testResults: set[pt] = set()
-for t in testResultarr:
-    x, y, z = t.split(",")
-    testResults.add(pt(int(x), int(y), int(z)))
-
-
 bigResultSet: set[pt] = set()
 for h in homeTransforms:
-    print(h)
-    print(homeTransforms[h])
     theseBeacons = parsed[h].beacons
     theseTransforms = homeTransforms[h][::-1]
     for b in theseBeacons:
         newBeacon = b
         for t in theseTransforms:
             newBeacon = t.applyTransformation(newBeacon)
-        if newBeacon not in testResults:
-            print("Wrong Beacon! ", newBeacon, b)
         bigResultSet.add(newBeacon)
 
-print(len(bigResultSet))
+# Calculate Manhattan Distance
+largestDistance = 0
+
+
+def calculateManhattan(
+    p1, p2
+) -> int:  # Shamelessly stolen from my own Day6.py of 2018 and adapted to this
+    return abs(p1.x - p2.x) + abs(p1.y - p2.y) + abs(p1.z - p2.z)
+
+
+for b1 in bigResultSet:
+    for b2 in bigResultSet:
+        if b1 == b2:
+            continue
+        dist = calculateManhattan(b1, b2)
+        if dist > largestDistance:
+            print(b1, b2, dist)
+            largestDistance = dist
+print(dist)
