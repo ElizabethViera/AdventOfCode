@@ -199,12 +199,6 @@ for i in range(len(parsed)):
             if result is not None:
                 overlaps.append((i, j, result))
 
-testOverlap = overlaps[0]
-testScanner = parsed[testOverlap[1]]
-for beacon in testScanner.beacons:
-    reversedTransformation = testOverlap[2].reverseTransformation()
-    newBeacon = reversedTransformation.applyTransformation(beacon)
-
 
 def getNeighbors(
     i: int, overlaps: list[tuple[int, int, Transform]]
@@ -231,10 +225,16 @@ while len(homeTransforms) < len(parsed):
                 homeTransforms[i] = homeTransforms[neighbor[0]] + [neighbor[1]]
 
 
+scannerResultsSet: set[pt] = set()
 bigResultSet: set[pt] = set()
 for h in homeTransforms:
     theseBeacons = parsed[h].beacons
     theseTransforms = homeTransforms[h][::-1]
+    scannerLocation = pt(0, 0, 0)
+    transformedScannerLocation = scannerLocation
+    for t in theseTransforms:
+        transformedScannerLocation = t.applyTransformation(transformedScannerLocation)
+    scannerResultsSet.add(transformedScannerLocation)
     for b in theseBeacons:
         newBeacon = b
         for t in theseTransforms:
@@ -245,18 +245,19 @@ for h in homeTransforms:
 largestDistance = 0
 
 
-def calculateManhattan(
-    p1, p2
-) -> int:  # Shamelessly stolen from my own Day6.py of 2018 and adapted to this
-    return abs(p1.x - p2.x) + abs(p1.y - p2.y) + abs(p1.z - p2.z)
+def getDistance(pointA, pointB):
+    # Manhattan Distance
+    xDist = abs(pointA.x - pointB.x)
+    yDist = abs(pointA.y - pointB.y)
+    zDist = abs(pointA.z - pointB.z)
+    return xDist + yDist + zDist
 
 
-for b1 in bigResultSet:
-    for b2 in bigResultSet:
-        if b1 == b2:
+for s1 in scannerResultsSet:
+    for s2 in scannerResultsSet:
+        if s1 == s2:
             continue
-        dist = calculateManhattan(b1, b2)
+        dist = getDistance(s1, s2)
         if dist > largestDistance:
-            print(b1, b2, dist)
             largestDistance = dist
-print(dist)
+print(largestDistance)
